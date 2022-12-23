@@ -50,6 +50,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+AUTH_USER_MODEL = 'expense.User'
+
 ROOT_URLCONF = 'finance.urls'
 
 TEMPLATES = [
