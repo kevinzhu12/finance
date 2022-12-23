@@ -15,10 +15,24 @@ def index(request):
         return render(request, "expense/login.html")
 
 def login_view(request):
-    return render(request, "expense/login.html")
+    if request.method == "POST":
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(request, username=username, password=password)
+        
+        if user is not None:
+            login(request, user)
+            return HttpResponseRedirect(reverse("index"))
+        else:
+            return render(request, "expense/login.html", {
+                "message": "Invalid username and/or password"
+            })
+    else:
+        return render(request, "expense/login.html")
 
 def logout_view(request):
-    pass
+    logout(request)
+    return HttpResponseRedirect(reverse("index"))
 
 def register(request):
     if request.method == "POST":

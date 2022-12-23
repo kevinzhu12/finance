@@ -28,7 +28,7 @@
                                 <a class="nav-link" href="{% url 'index' %}">Homepage</a>
                             </li>
                             <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     View Month
                                 </a>
                                 <ul class="dropdown-menu">
@@ -47,14 +47,14 @@
                                 </ul>
                             </li>
                             <li class="navbar-item">
-                                <a class="nav-link" href="#">Logout</a>
+                                <a class="nav-link" href="{% url 'logout' %}">Logout</a>
                             </li>
                         {% else %}
                             <li class="navbar-item">
-                                <a class="nav-link" href="#">Login</a>
+                                <a class="nav-link" href="{% url 'login' %}">Login</a>
                             </li>
                             <li class="navbar-item">
-                                <a class="nav-link" href="#">Register</a>
+                                <a class="nav-link" href="{% url 'register' %}">Register</a>
                             </li>
                         {% endif %}
                         
