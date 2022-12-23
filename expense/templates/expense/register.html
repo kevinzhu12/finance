@@ -1,5 +1,29 @@
 {% extends 'expense/layout.html' %}
 
 {% block body %}
-    this is the register page
+    <h2>Register</h2>
+
+    {% if message %}
+        {{ message }}
+    {% endif %}
+
+    <form action="{% url 'register' %}" method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <input class="form-control" type="text" name="username" placeholder="Username">
+        </div>
+        <div class="form-group">
+            <input class="form-control" type="email" name="email" placeholder="Email">
+        </div>
+        <div class="form-group">
+            <input class="form-control" type="password" name="password" placeholder ="Password">
+        </div>
+        <div class="form-group">
+            <input class="form-control" type="password" name="confirmation" placeholder="Confirm Password">
+        </div>
+        <div class="form-group">
+            <input class="btn btn-primary" type="submit" value="Register">
+        </div>
+    </form>
+    <div>Already have an account? <a href="{% url 'login' %}">Login here</a></div>
 {% endblock %}
