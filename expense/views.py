@@ -4,15 +4,14 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from .models import User
+from .models import User, Category, Item, Expense
 # Create your views here.
 
 def index(request):
     if request.user.is_authenticated:
         return render(request, "expense/index.html", {
+            "categories": Category.objects.all()
         })
-    else:
-        return render(request, "expense/login.html")
 
 def login_view(request):
     #redirects user to homepage when trying to visit login page if already logged in
@@ -76,9 +75,33 @@ def month_view(request, month):
         "month": month
     })
 
+def create_category(request):
+    if request.method == "POST":
+        name = request.POST['name'].capitalize()
+        initial = request.POST['initial'].capitalize()
+        color = request.POST['color']
+
+        #check if name, initial, or color already exist in a category
+        categories = Category.objects.all()
+
+        #stop function prematurely if any of these vars are already in-use
+        for category in categories:
+            if category.name == name or category.initial == initial or category.color == color:
+                #already exists
+                return render(request, "expense/index.html", {
+                    "message": "Error: The name, initial, and/or color already exists. Please choose a different category."
+                })
+
+        #if none of these are true -- run this -- should i do a for-else loop? seems right but not necessary?
+        newCategory = Category(name=name, initial=initial, color=color)
+        newCategory.save()
+        return HttpResponseRedirect(reverse('index'))
+
+    return HttpResponseRedirect(reverse('index'))
+
 #do it as a rerender of the page for now -- maybe change to js later so no need to reload page
 def add_expense(request):
     print(request.POST)
-    
+    #
 
     return HttpResponseRedirect(reverse('index'))

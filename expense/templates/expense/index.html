@@ -1,6 +1,41 @@
 {% extends "expense/layout.html" %}
 
 {% block body %}
+    <h2>Homepage</h2>
+
+    {% if message %}
+        {{ message }}
+    {% endif %}
+
+    <form action="{% url 'create_category' %}" method="post">
+        {% csrf_token %}
+        <button class="form-group form-control dropdown-toggle" data-bs-toggle="dropdown">Create a New Category</button>
+        <div>
+            <ul class="dropdown-menu form-control">
+                <li class="dropdown-item">
+                    <div class="form-group">
+                        <input class="form-control" required type="text" name="name" placeholder="Category Name">
+                    </div>
+                </li>
+                <li class="dropdown-item">
+                    <div class="form-group">
+                        <input class="form-control" required maxlength="1" type="text" name="initial" placeholder="Category Initial">
+                    </div>
+                </li>
+                <li class="dropdown-item">
+                    <div class="form-group">
+                        <input class="form-control" required type="color" name="color" placeholder="Color">
+                    </div>
+                </li>
+                <li class="dropdown-item">
+                    <div class="form-group">
+                        <input class="form-control" type="submit">
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </form>
+
     <form action="{% url 'add_expense' %}" method="post">
         {% csrf_token %}
         <button class="form-group form-control dropdown-toggle" data-bs-toggle="dropdown">Add a new expense</button>
@@ -8,7 +43,7 @@
             <ul class="dropdown-menu form-control">
                 <li class="dropdown-item">
                     <div class="form-group">
-                        <input class="form-control" autofocus required type="text" name="name" placeholder="Item Name">
+                        <input class="form-control" required type="text" name="name" placeholder="Item Name">
                     </div>
                 </li>
                 <li class="dropdown-item">
@@ -18,12 +53,17 @@
                 </li>
                 <li class="dropdown-item">
                     <div class="form-group">
-                        <input class="form-control" required type="date" name="price" placeholder="Date of Purchase">
+                        <input class="form-control" required type="date" name="date" placeholder="Date of Purchase">
                     </div>
                 </li>
                 <li class="dropdown-item">
                     <div class="form-group">
-                        <input class="form-control" required type="text" name="category" placeholder="Category">
+                        <select class="form-control" required name="category" placeholder="Category">
+                            <option value="" disabled selected hidden>Choose a Category...</option>
+                            {% for category in categories %}
+                                <option value="{{category.initial}}">{{category.initial}} - {{category.name}}</option>
+                            {% endfor %}
+                        </select>
                     </div>
                 </li>
                 <li class="dropdown-item">
@@ -43,8 +83,6 @@
                 </li>
             </ul>
         </div>
-        
     </form>
-
     
 {% endblock %}
