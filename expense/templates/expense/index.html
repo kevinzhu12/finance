@@ -1,10 +1,43 @@
 {% extends "expense/layout.html" %}
 
 {% block body %}
-    <ul>
-        <li>
-            This is the index page. Update to the index.
-        </li>
-    </ul>
+    <form action="{% url 'addExpense' %}" method="post">
+        {% csrf_token %}
+        <button class="form-group form-control dropdown-toggle" data-bs-toggle="dropdown">Add a new expense</button>
+        
+        <ul class="dropdown-menu form-control">
+            <li class="dropdown-item">
+                <div class="form-group">
+                    <input class="form-control" autofocus type="text" name="name" placeholder="Item Name">
+                </div>
+            </li>
+            <li class="dropdown-item">
+                <div class="form-group">
+                    <input class="form-control" type="text" name="price" placeholder="Price">
+                </div>
+            </li>
+            <li class="dropdown-item">
+                <div class="form-group">
+                    <input class="form-control" type="text" name="category" placeholder="Category">
+                </div>
+            </li>
+            <li class="dropdown-item">
+                <div class="form-group">
+                    <input class="form-control" type="text" name="description" placeholder="Description (optional)">
+                </div>
+            </li>
+            <li class="dropdown-item">
+                <div class="form-group">
+                    <input class="form-control" type="text" name="location" placeholder="Location (optional)">
+                </div>
+            </li>
+            <li class="dropdown-item">
+                <div class="form-group">
+                    <input class="form-control" type="submit">
+                </div>
+            </li>
+        </ul>
+    </form>
 
+    
 {% endblock %}

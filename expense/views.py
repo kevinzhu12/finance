@@ -75,3 +75,8 @@ def month_view(request, month):
     return render(request, "expense/month.html", {
         "month": month
     })
+
+#do it as a rerender of the page for now -- maybe change to js later so no need to reload page
+def add_expense(request):
+    print(request.POST)
+    return render(request, "expense/index.html")
