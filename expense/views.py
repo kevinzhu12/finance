@@ -15,6 +15,10 @@ def index(request):
         return render(request, "expense/login.html")
 
 def login_view(request):
+    #redirects user to homepage when trying to visit login page if already logged in
+    if request.user.is_authenticated:
+        return HttpResponseRedirect(reverse("index"))
+
     if request.method == "POST":
         username = request.POST['username']
         password = request.POST['password']
@@ -35,6 +39,10 @@ def logout_view(request):
     return HttpResponseRedirect(reverse("index"))
 
 def register(request):
+    #redirects user to homepage when trying to visit register page if already logged in
+    # if request.user.is_authenticated:
+    #     return HttpResponseRedirect(reverse("index"))
+
     if request.method == "POST":
         print(request.POST)
 
