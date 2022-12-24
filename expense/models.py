@@ -8,6 +8,7 @@ class User(AbstractUser):
     pass
 
 class Item(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="userItems", default=None)
     name = models.CharField(max_length=255)
     price = models.DecimalField(decimal_places=2, max_digits=1000)
     desc = models.TextField(blank=True)
@@ -17,6 +18,7 @@ class Item(models.Model):
         return f"{self.name}: ${self.price}"
 
 class Category(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="userCategories", default=None)
     name = models.CharField(max_length=255, default=None)
     initial = models.CharField(max_length=1, validators=[MinLengthValidator(1, 'There must be a one letter initial')], default=None)
     #hex code for the color "#XXXXXX" as str selected through color wheel

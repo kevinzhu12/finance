@@ -10,7 +10,7 @@ from .models import User, Category, Item, Expense
 def index(request):
     if request.user.is_authenticated:
         return render(request, "expense/index.html", {
-            "categories": Category.objects.all()
+            "categories": Category.objects.filter(user=request.user)
         })
 
 def login_view(request):
@@ -93,7 +93,7 @@ def create_category(request):
                 })
 
         #if none of these are true -- run this -- should i do a for-else loop? seems right but not necessary?
-        newCategory = Category(name=name, initial=initial, color=color)
+        newCategory = Category(user=request.user, name=name, initial=initial, color=color)
         newCategory.save()
         return HttpResponseRedirect(reverse('index'))
 
