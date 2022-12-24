@@ -32,18 +32,13 @@
                                     View Month
                                 </a>
                                 <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="#">January</a></li>
-                                    <li><a class="dropdown-item" href="#">February</a></li>
-                                    <li><a class="dropdown-item" href="#">March</a></li>
-                                    <li><a class="dropdown-item" href="#">April</a></li>
-                                    <li><a class="dropdown-item" href="#">May</a></li>
-                                    <li><a class="dropdown-item" href="#">June</a></li>
-                                    <li><a class="dropdown-item" href="#">July</a></li>
-                                    <li><a class="dropdown-item" href="#">August</a></li>
-                                    <li><a class="dropdown-item" href="#">September</a></li>
-                                    <li><a class="dropdown-item" href="#">October</a></li>
-                                    <li><a class="dropdown-item" href="#">November</a></li>
-                                    <li><a class="dropdown-item" href="#">December</a></li>
+                                    <!-- template for one month
+                                    <li><a class="dropdown-item" href="{% url 'month' 'Janurary' %}">January</a></li> -->
+                                    {% with "Janurary Feburary March April May June July August September October November December" as list %}
+                                        {% for month in list.split %}
+                                            <li><a class="dropdown-item" href="{% url 'month' month%}"> {{ month }} </a></li>
+                                        {% endfor %}
+                                    {% endwith %}
                                 </ul>
                             </li>
                             <li class="navbar-item">

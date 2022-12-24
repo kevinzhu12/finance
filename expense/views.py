@@ -69,3 +69,9 @@ def register(request):
         return HttpResponseRedirect(reverse("index"))
 
     return render(request, "expense/register.html")
+
+def month_view(request, month):
+    #use month as some sort of model or filter all exepnses by this month and send that info to the month page
+    return render(request, "expense/month.html", {
+        "month": month
+    })
