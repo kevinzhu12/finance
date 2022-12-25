@@ -1,8 +1,11 @@
+import json
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
-from django.http import HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
+from django.views.decorators.csrf import csrf_exempt
+from urllib3 import HTTPResponse
 
 from .models import User, Category, Item, Expense
 # Create your views here.
@@ -82,22 +85,53 @@ def create_category(request):
         color = request.POST['color']
 
         #check if name, initial, or color already exist in a category
-        categories = Category.objects.all()
+        categories = Category.objects.filter(user=request.user)
 
         #stop function prematurely if any of these vars are already in-use
         for category in categories:
             if category.name == name or category.initial == initial or category.color == color:
                 #already exists
-                return render(request, "expense/index.html", {
-                    "message": "Error: The name, initial, and/or color already exists. Please choose a different category."
-                })
+                return HttpResponseRedirect(reverse('index'))
 
         #if none of these are true -- run this -- should i do a for-else loop? seems right but not necessary?
         newCategory = Category(user=request.user, name=name, initial=initial, color=color)
         newCategory.save()
-        return HttpResponseRedirect(reverse('index'))
-
+    
     return HttpResponseRedirect(reverse('index'))
+
+
+@csrf_exempt
+def update_category(request, category_id):
+    try:
+        category = Category.objects.get(pk=category_id)
+    except Category.DoesNotExist:
+        return JsonResponse({"error": "Category not found."}, status=404)
+
+    if request.method == "GET":
+        return JsonResponse(category.serialize())
+
+    elif request.method == "PUT":
+        data = json.loads(request.body)
+
+        if data.get("delete"):
+            category.delete()
+            return HttpResponse(status=204)
+
+        newName = data['name'].capitalize()
+        newInitial = data['initial'].capitalize()
+        newColor = data['color']
+
+        if data.get("name").capitalize() != category.name and Category.objects.filter(name=newName).count() == 0:
+            category.name = newName
+        if data.get("initial").capitalize() != category.initial and Category.objects.filter(initial=newInitial).count() == 0:
+            category.initial = newInitial
+        if data.get("color") != category.color and Category.objects.filter(color=newColor).count() == 0:
+            category.color = newColor
+        category.save()
+
+        return HttpResponse(status=202)
+
+
 
 #do it as a rerender of the page for now -- maybe change to js later so no need to reload page
 def add_expense(request):

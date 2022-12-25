@@ -3,9 +3,42 @@
 {% block body %}
     <h2>Homepage</h2>
 
-    {% if message %}
-        {{ message }}
-    {% endif %}
+    {% for category in categories %}
+        <div>
+            <form data-category_id={{category.id}}>
+                {% csrf_token %}
+                <button class="form-group form-control category" id="update-category" data-bs-toggle="dropdown" style="color: {{category.color}}">{{ category.name }} {{ category.initial }}</button>
+                <ul class="dropdown-menu category">
+                    <li class="dropdown-item">
+                        <div>
+                            <input class="form-control" id="update-category-name" data-category_id={{category.id}} type="text" name="name" placeholder="Category Name">
+                        </div>
+                    </li>
+                    <li class="dropdown-item">
+                        <div>
+                            <input class="form-control" id="update-category-initial" data-category_id={{category.id}} maxlength="1" id="update-category-initial"type="text" name="initial" placeholder="Category Intial">
+                        </div>
+                    </li>
+                    <li class="dropdown-item">
+                        <div>
+                            <input class="form-control" id="update-category-color" data-category_id={{category.id}} type="color" name="color" placeholder="Category Color">
+                        </div>
+                    </li>
+                    <li class="dropdown-item">
+                        <div>
+                            <input class="form-control" id="save-category" data-category_id={{category.id}} type="button" name="save" value="Save">
+                        </div>
+                    </li>
+                    <li class="dropdown-item">
+                        <div>
+                            <input class="form-control" id="delete-category" data-category_id={{category.id}} type="button" name="delete" value="Delete">
+                        </div>
+                    </li>
+                </ul>
+            </form>
+        </div>
+        
+    {% endfor%}
 
     <form action="{% url 'create_category' %}" method="post">
         {% csrf_token %}
@@ -29,7 +62,7 @@
                 </li>
                 <li class="dropdown-item">
                     <div class="form-group">
-                        <input class="form-control" type="submit">
+                        <input class="form-control" id="category-form" type="submit">
                     </div>
                 </li>
             </ul>

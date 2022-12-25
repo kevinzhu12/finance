@@ -1,3 +1,9 @@
 .form-group {
-    padding: 5px 2px 5px 02px ;
+    padding: 5px 2px 5px 2px ;
+}
+
+.category {
+    position: relative;
+    float: left;
+    width: 25%
 }

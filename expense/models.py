@@ -25,8 +25,17 @@ class Category(models.Model):
     #dont need to worry about wrong str length? unless manually added through admin -- error
     color = models.CharField(max_length=7, default=None)
 
+    def serialize(self):
+        return {
+            "name": self.name,
+            "initial": self.initial,
+            "color": self.color
+        }
+
     def __str__(self):
         return f"{self.name} - {self.initial.upper()}"
+
+
 
 class Expense(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="userExpenses", default=None)
@@ -35,4 +44,4 @@ class Expense(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="expensesUnderCategory", default=None)
 
     def __str__(self):
-        return f"{self.date}{self.category.initial}: {self.item.name}"
+        return f"{self.user.username} - {self.date}{self.category.initial}: {self.item.name}"
