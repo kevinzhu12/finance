@@ -5,7 +5,6 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
-from urllib3 import HTTPResponse
 
 from .models import User, Category, Item, Expense
 # Create your views here.
@@ -13,7 +12,7 @@ from .models import User, Category, Item, Expense
 def index(request):
     if request.user.is_authenticated:
         return render(request, "expense/index.html", {
-            "categories": Category.objects.filter(user=request.user)
+            "categories": Category.objects.filter(user=request.user).order_by("name")
         })
 
 def login_view(request):
@@ -135,7 +134,10 @@ def update_category(request, category_id):
 
 #do it as a rerender of the page for now -- maybe change to js later so no need to reload page
 def add_expense(request):
-    print(request.POST)
-    #
+    if request.method == "POST":
+        newItem = Item(user=request.user, name=request.POST['name'], price=request.POST['price'], desc=request.POST['description'], loc=request.POST['location'])
+        newItem.save()
+        newExpense = Expense(user=request.user, date=request.POST['date'], item=newItem, category=Category.objects.get(initial=request.POST['category']))
+        newExpense.save()
 
     return HttpResponseRedirect(reverse('index'))
