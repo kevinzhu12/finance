@@ -1,3 +1,21 @@
+@keyframes hide {
+    0% {
+        opacity: 1;
+        height: 100%;
+        margin-bottom: 20px;
+    }
+    25% {
+        opacity: 1;
+        height: 100%;
+        margin-bottom: 20px;
+    }
+    100% {
+        opacity: 0;
+        height: 0px;
+        margin-bottom: 0px;
+    }
+}
+
 .form-group {
     padding: 5px 2px 5px 2px ;
 }
@@ -6,4 +24,43 @@
     position: relative;
     float: left;
     width: 25%
+}
+
+#expense {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid black;
+    border-radius: 10px;
+    margin: 0px 20px 20px 20px;
+    animation-name: hide;
+    animation-duration: 2s;
+    animation-fill-mode: forwards;
+    animation-play-state: paused;
+}
+
+#edit-expense, #delete-expense {
+    position: relative;
+    float: right;
+    border: none;   
+    padding: 20px;
+    background-color: inherit
+}
+
+#edit-expense:hover {
+    background-color: lightgrey;
+}
+#delete-expense:hover {
+    background-color: lightcoral;
+}
+
+#expense-info {
+    position: relative;
+    float: left;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: calc(100% - 155px);
+    height: 64px;
+    font-size: 21px;
 }

@@ -45,3 +45,11 @@ class Expense(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.date}{self.category.initial}: {self.item.name}"
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "date": self.date.strftime('%m/%d/%Y'),
+            "item": {"name": self.item.name, "price": self.item.price},
+            "category": {"initial": self.category.initial, "color": self.category.color}
+        }

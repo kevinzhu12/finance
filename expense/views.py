@@ -12,7 +12,8 @@ from .models import User, Category, Item, Expense
 def index(request):
     if request.user.is_authenticated:
         return render(request, "expense/index.html", {
-            "categories": Category.objects.filter(user=request.user).order_by("name")
+            "categories": Category.objects.filter(user=request.user).order_by("name"),
+            "expenses": Expense.objects.filter(user=request.user).order_by("date")
         })
 
 def login_view(request):
@@ -141,3 +142,12 @@ def add_expense(request):
         newExpense.save()
 
     return HttpResponseRedirect(reverse('index'))
+
+
+def get_expenses(request):
+    userExpenses = Expense.objects.filter(user=request.user).order_by("date")
+    data = [expense.serialize() for expense in userExpenses]
+
+    return JsonResponse({
+        "expenses": data
+    })

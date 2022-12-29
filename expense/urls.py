@@ -11,4 +11,5 @@ urlpatterns = [
     path("create_category", views.create_category, name="create_category"),
     path("update_category/<int:category_id>", views.update_category, name="update_category"),
     path("add_expense", views.add_expense, name="add_expense"),
+    path("get_expenses", views.get_expenses, name="get_expenses")
 ]
