@@ -122,6 +122,18 @@ const deleteCategory = (category_id) => {
 
 const deleteExpense = (element, expense_id) => {
     element.parentElement.style.animationPlayState = 'running'
+    element.style.animationPlayState = 'running'
+
+    editbutton = [...document.querySelectorAll("#edit-expense")].find( (edit) => {
+        return edit.parentElement.dataset['expense_id'] === expense_id
+    })
+    editbutton.style.animationPlayState = 'running'
+
+    expenseInfo = [...document.querySelectorAll("#expense-info")].find( (edit) => {
+        return edit.parentElement.dataset['expense_id'] === expense_id
+    })
+    expenseInfo.style.animationPlayState = 'running'
+
     element.parentElement.addEventListener('animationend', () => {
         element.parentElement.remove()
     })
@@ -135,8 +147,6 @@ const load_chart = async () => {
 
     const ctx = document.querySelector("#myChart")
 
-    console.log(get_expense_colors(totalExpense))
-
     new Chart(ctx, {
         type: 'doughnut',
         data: {
@@ -144,10 +154,10 @@ const load_chart = async () => {
             datasets: [{
                 label: 'Amount of $',
                 data: get_expense_spendings(totalExpense),
-                hoverOffset: 20,
+                hoverOffset: 5,
                 backgroundColor: get_expense_colors(totalExpense)
             }]
-        }
+        },
     })
 }
 
