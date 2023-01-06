@@ -51,5 +51,5 @@ class Expense(models.Model):
             "id": self.id,
             "date": self.date.strftime('%m/%d/%Y'),
             "item": {"name": self.item.name, "price": self.item.price},
-            "category": {"initial": self.category.initial, "color": self.category.color}
+            "category": {"name": self.category.name, "initial": self.category.initial, "color": self.category.color}
         }

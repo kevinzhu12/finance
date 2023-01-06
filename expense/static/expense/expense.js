@@ -24,6 +24,7 @@ document.addEventListener("click", (event) => {
 })
 
 document.addEventListener("DOMContentLoaded", () => {
+    load_chart()
     load_expenses()
 })
 
@@ -71,17 +72,19 @@ const updateCategory = (category_id) => {
     })
 }
 
-const load_expenses = () => {
-    fetch('/get_expenses')
+const get_expense = async () => {
+    return fetch('/get_expenses')
     .then(response => response.json())
+}
+
+const load_expenses = () => {
+    get_expense()
     .then(data => {
         data.expenses.forEach(add_expense)
     })
 }
 
 const add_expense = (e) => {
-    console.log(e)
-
     const expense = document.createElement('div')
     expense.id = 'expense'
     expense.dataset.expense_id = e.id
@@ -106,8 +109,6 @@ const expenseButtons = () => {
 }
 
 const deleteCategory = (category_id) => {
-    console.log(category_id)   
-
     fetch(`/update_category/${category_id}`, {
         method: "put",
         body: JSON.stringify({
@@ -125,6 +126,82 @@ const deleteExpense = (element, expense_id) => {
         element.parentElement.remove()
     })
 
-    console.log(expense_id)
     //remove from DB
+}
+
+
+const load_chart = async () => {
+    const totalExpense = await getTotalExpense()
+
+    const ctx = document.querySelector("#myChart")
+
+    console.log(get_expense_colors(totalExpense))
+
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: get_expense_labels(totalExpense),
+            datasets: [{
+                label: 'Amount of $',
+                data: get_expense_spendings(totalExpense),
+                hoverOffset: 20,
+                backgroundColor: get_expense_colors(totalExpense)
+            }]
+        }
+    })
+}
+
+const get_expense_labels = (totalExpense) => {
+    let labels = []
+    Object.entries(totalExpense).forEach( ([, expenseCategory]) => {
+        labels.push(expenseCategory.name)
+    })
+
+    return labels
+}
+
+const get_expense_spendings = (totalExpense) => {
+    let spendings = []
+    Object.entries(totalExpense).forEach( ([, expenseCategory]) => {
+        spendings.push(expenseCategory.totalAmount)
+    })
+
+    return spendings
+}
+
+const get_expense_colors = (totalExpense) => {
+    let colors = []
+    Object.entries(totalExpense).forEach( ([,expenseCategory]) => {
+        colors.push(`${expenseCategory.color}`)
+    })
+
+    return colors
+}
+
+const getTotalExpense = async () => {
+    var expense_data = {}
+
+    await get_expense()
+    .then(data => {
+        data.expenses.forEach((expense) => {
+            // console.log(expense)
+            if (!(expense.category.initial in expense_data)) {
+                // console.log(expense.category.initial)
+                expense_data[expense.category.initial] = {
+                    "name": expense.category.name,
+                    "totalAmount": Number(expense.item.price),
+                    "color": expense.category.color
+                }
+            }
+            else {
+                expense_data[expense.category.initial].totalAmount += Number(expense.item.price)
+            }
+        })
+    })
+
+    var sorted_expense_data = Object.entries(expense_data)
+        .sort(([,e1], [,e2]) => e2.totalAmount-e1.totalAmount)
+        .reduce((r, [k, v]) => ({...r, [k]: v}), {})
+
+    return sorted_expense_data
 }
