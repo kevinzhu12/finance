@@ -139,6 +139,20 @@ const deleteExpense = (element, expense_id) => {
     })
 
     //remove from DB
+
+    fetch(`/delete_expense/${expense_id}`)
+    .then(() => {
+        var oldCanv = document.getElementById('myChart')
+        var canvasContainer = oldCanv.parentElement
+
+        canvasContainer.removeChild(oldCanv)
+
+        var newCanv = document.createElement('canvas')
+        newCanv.id = 'myChart'
+
+        canvasContainer.appendChild(newCanv)
+        load_chart()
+    })
 }
 
 
@@ -154,10 +168,13 @@ const load_chart = async () => {
             datasets: [{
                 label: 'Amount of $',
                 data: get_expense_spendings(totalExpense),
-                hoverOffset: 5,
+                hoverOffset: 20,
                 backgroundColor: get_expense_colors(totalExpense)
             }]
         },
+        options: {
+            radius: "95%",
+        }
     })
 }
 

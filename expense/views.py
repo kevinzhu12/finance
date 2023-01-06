@@ -144,6 +144,12 @@ def add_expense(request):
     return HttpResponseRedirect(reverse('index'))
 
 
+def delete_expense(request, expense_id):
+    print(expense_id)
+    Expense.objects.get(pk=expense_id).delete()
+    return HttpResponse(status=204)
+
+
 def get_expenses(request):
     userExpenses = Expense.objects.filter(user=request.user).order_by("date")
     data = [expense.serialize() for expense in userExpenses]
