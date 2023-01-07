@@ -95,7 +95,7 @@
                 </li>
                 <li class="dropdown-item">
                     <div class="form-group">
-                        <select class="form-control" required name="category" placeholder="Category">
+                        <select class="form-control" required name="category">
                             <option value="" disabled selected hidden>Choose a Category...</option>
                             {% for category in categories %}
                                 <option value="{{category.initial}}">{{category.initial}} - {{category.name}}</option>

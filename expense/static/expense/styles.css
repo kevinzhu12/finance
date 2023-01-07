@@ -102,3 +102,14 @@
     margin: auto;
     padding: 50px;
 }
+
+.edit-expense-form {
+    display: inline;
+}
+
+.edit-expense-form > .form-control { 
+    position: relative;
+    margin: auto;
+    width: 95%;
+    margin-bottom: 10px;
+}

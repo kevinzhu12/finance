@@ -15,6 +15,8 @@ def index(request):
             "categories": Category.objects.filter(user=request.user).order_by("name"),
             "expenses": Expense.objects.filter(user=request.user).order_by("date")
         })
+    else:
+        return HttpResponseRedirect(reverse("login"))
 
 def login_view(request):
     #redirects user to homepage when trying to visit login page if already logged in
@@ -77,6 +79,12 @@ def month_view(request, month):
     return render(request, "expense/month.html", {
         "month": month
     })
+
+def get_categories(request):
+    categories = Category.objects.all().order_by('initial')
+    listOfCategories = [f'{category.initial} - {category.name}' for category in categories]
+
+    return JsonResponse({"categories": listOfCategories})
 
 def create_category(request):
     if request.method == "POST":

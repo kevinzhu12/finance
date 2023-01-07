@@ -18,9 +18,18 @@ document.addEventListener("click", (event) => {
     }
     else if (element.id === "delete-expense") {
         selected_category_id = element.parentElement.dataset['expense_id']
-        hide_element = element.parentElement
         deleteExpense(element, selected_category_id)
     }
+    else if (element.id === "edit-expense") {
+        selected_expense_id = element.parentElement.dataset['expense_id']
+        editExpense(selected_expense_id)
+    }
+    else if (element.id === "edit-expense-submit") {
+        selected_expense_id = (element.parentElement.parentElement.dataset['expense_id'])
+        console.log(selected_expense_id)
+        
+    }
+
 })
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -48,6 +57,18 @@ const fillUpdateCategory = (category_id) => {
         selected_category_initial.value = category.initial
         selected_category_color.value = category.color
     })
+}
+
+const getCategories = async () => {
+    var categoryList = []
+
+    await fetch('/get_categories')
+    .then(response => response.json())
+    .then(category => {
+        categoryList = category.categories
+    })
+
+    return categoryList
 }
 
 const updateCategory = (category_id) => {
@@ -231,4 +252,87 @@ const getTotalExpense = async () => {
         .reduce((r, [k, v]) => ({...r, [k]: v}), {})
 
     return sorted_expense_data
+}
+
+const editExpense = async (expense_id) => {
+    const expenseContainer = [...document.querySelectorAll('#expense')]
+        .find((expense) => expense.dataset["expense_id"] === expense_id)
+
+
+    const editFormPresent = expenseContainer.querySelector('.edit-expense-form')
+    
+    if (editFormPresent) {
+        expenseContainer.removeChild(editFormPresent)
+    }
+    else {
+        expenseContainer.appendChild(await createEditForm())
+    }
+
+}
+
+const createEditForm = async () => {
+    editForm = document.createElement('form')
+    //create a form here. initally hidden, and have it animated when on editExpense
+    editForm.className = "edit-expense-form form-group"
+
+    itemName = document.createElement('input')
+    itemName.className = "form-control"
+    itemName.name = "name"
+    itemName.placeholder = "Item Name"
+    
+    itemPrice = document.createElement('input')
+    itemPrice.className = "form-control"
+    itemPrice.name = "price"
+    itemPrice.placeholder = "Item Price"
+
+    itemDate = document.createElement('input')
+    itemDate.className = "form-control"
+    itemDate.name = "date"
+    itemDate.type = "date"
+    
+    itemCategory = document.createElement('select')
+    itemCategory.className = "form-control"
+    itemCategory.name = "category"
+
+    blankOption = document.createElement('option')
+    blankOption.value = ""
+    blankOption.disabled = true
+    blankOption.selected = true
+    blankOption.hidden = true
+    blankOption.innerHTML = "Choose a Category"
+    itemCategory.append(blankOption)
+
+    const categories = await getCategories()
+    categories.forEach(category => {
+        newOption = document.createElement('option')
+        newOption.innerHTML = category
+
+        itemCategory.append(newOption)
+    })
+
+    itemDesc = document.createElement('input')
+    itemDesc.className = "form-control"
+    itemDesc.name = "desc"
+    itemDesc.placeholder = "Description (optional)"
+
+    itemLoc = document.createElement('input')
+    itemLoc.className = "form-control"
+    itemLoc.name = "loc"
+    itemLoc.placeholder = "Location (optional)"
+
+    submitEdit = document.createElement('input')
+    submitEdit.className = "form-control"
+    submitEdit.id = "edit-expense-submit"
+    submitEdit.type = "button"
+    submitEdit.value = "Update"
+
+    editForm.append(itemName)
+    editForm.append(itemPrice)
+    editForm.append(itemDate)
+    editForm.append(itemCategory)
+    editForm.append(itemDesc)
+    editForm.append(itemLoc)
+    editForm.append(submitEdit)
+
+    return editForm
 }
