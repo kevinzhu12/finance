@@ -100,7 +100,7 @@ const get_expense = async () => {
     .then(response => response.json())
 }
 
-const load_expenses = () => {
+const load_expenses = async () => {
     get_expense()
     .then(data => {
         data.expenses.forEach(add_expense)
@@ -172,7 +172,7 @@ const deleteExpense = (element, expense_id) => {
 
 const load_chart = async () => {
     const totalExpense = await getTotalExpense()
-
+    
     const ctx = document.querySelector("#myChart")
 
     new Chart(ctx, {
@@ -207,6 +207,7 @@ const reload_chart = () => {
 
 const get_expense_labels = (totalExpense) => {
     let labels = []
+
     Object.entries(totalExpense).forEach( ([, expenseCategory]) => {
         labels.push(expenseCategory.name)
     })
@@ -254,6 +255,7 @@ const getTotalExpense = async () => {
     })
 
     var sorted_expense_data = Object.entries(expense_data)
+        .sort()
         .sort(([,e1], [,e2]) => e2.totalAmount-e1.totalAmount)
         .reduce((r, [k, v]) => ({...r, [k]: v}), {})
 
@@ -273,7 +275,6 @@ const editExpense = async (expense_id) => {
     else {
         expenseContainer.appendChild(await createEditForm())
     }
-
 }
 
 const createEditForm = async () => {
@@ -365,12 +366,10 @@ const update_edit_form = (expense_id, form) => {
         method: "Put",
         body: JSON.stringify(edit_body)
     })
-    .then(() => {
-        
+    .then(() => {   
         reload_chart()
         reload_expenses()
     })
-
 }
 
 const reload_expenses = () => {
