@@ -26,8 +26,6 @@ document.addEventListener("click", (event) => {
     }
     else if (element.id === "edit-expense-submit") {
         selected_expense_id = (element.parentElement.parentElement.dataset['expense_id'])
-
-        // eform = (document.getElementsByClassName('edit-expense-form')[0])
         editForm = [...document.querySelectorAll('#edit-expense-form')].find(form => form.parentElement.dataset['expense_id'] === selected_expense_id)
 
         update_edit_form(selected_expense_id, editForm)
@@ -161,7 +159,6 @@ const deleteExpense = (element, expense_id) => {
         element.parentElement.remove()
     })
 
-    //remove from DB
 
     fetch(`/delete_expense/${expense_id}`)
     .then(() => {

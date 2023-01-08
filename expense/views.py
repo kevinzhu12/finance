@@ -199,3 +199,6 @@ def update_expense(request, expense_id):
     targetExpense.save()
 
     return HttpResponse(status=204)
+
+def upload(request):
+    return render(request, 'expense/upload.html')

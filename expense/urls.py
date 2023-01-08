@@ -15,4 +15,5 @@ urlpatterns = [
     path("delete_expense/<int:expense_id>", views.delete_expense, name="delete_expense"),
     path("get_expenses", views.get_expenses, name="get_expenses"),
     path("update_expense/<int:expense_id>", views.update_expense, name="update_expense"),
+    path("upload", views.upload, name="upload")
 ]
