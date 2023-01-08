@@ -165,3 +165,32 @@ def get_expenses(request):
     return JsonResponse({
         "expenses": data
     })
+
+@csrf_exempt
+def update_expense(request, expense_id):
+    try:
+        targetExpense = Expense.objects.get(pk=expense_id)
+        targetItem = targetExpense.item
+    except:
+        return JsonResponse({"error": "Cannot find expense"}, status=404)
+    
+    updateInfo = json.loads(request.body)
+    
+    if updateInfo.get("name") is not None:
+        targetItem.name = updateInfo['name']
+    if updateInfo.get("price") is not None:
+        targetItem.price = updateInfo['price']
+    if updateInfo.get("desc") is not None:
+        targetItem.desc = updateInfo['desc']
+    if updateInfo.get("loc") is not None:
+        targetItem.loc = updateInfo['loc']
+    if updateInfo.get('date') is not None:
+        targetExpense.date = updateInfo['date']
+    if updateInfo.get('category') is not None:
+        updateCategory = Category.objects.get(initial=updateInfo['category'][:1])
+        targetExpense.category = updateCategory        
+
+    targetItem.save()
+    targetExpense.save()
+
+    return HttpResponse(status=204)

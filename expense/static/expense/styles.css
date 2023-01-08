@@ -103,11 +103,11 @@
     padding: 50px;
 }
 
-.edit-expense-form {
+#edit-expense-form {
     display: inline;
 }
 
-.edit-expense-form > .form-control { 
+#edit-expense-form > .form-control { 
     position: relative;
     margin: auto;
     width: 95%;

@@ -26,8 +26,11 @@ document.addEventListener("click", (event) => {
     }
     else if (element.id === "edit-expense-submit") {
         selected_expense_id = (element.parentElement.parentElement.dataset['expense_id'])
-        console.log(selected_expense_id)
-        
+
+        // eform = (document.getElementsByClassName('edit-expense-form')[0])
+        editForm = [...document.querySelectorAll('#edit-expense-form')].find(form => form.parentElement.dataset['expense_id'] === selected_expense_id)
+
+        update_edit_form(selected_expense_id, editForm)
     }
 
 })
@@ -36,7 +39,6 @@ document.addEventListener("DOMContentLoaded", () => {
     load_chart()
     load_expenses()
 })
-
 
 
 
@@ -163,16 +165,7 @@ const deleteExpense = (element, expense_id) => {
 
     fetch(`/delete_expense/${expense_id}`)
     .then(() => {
-        var oldCanv = document.getElementById('myChart')
-        var canvasContainer = oldCanv.parentElement
-
-        canvasContainer.removeChild(oldCanv)
-
-        var newCanv = document.createElement('canvas')
-        newCanv.id = 'myChart'
-
-        canvasContainer.appendChild(newCanv)
-        load_chart()
+        reload_chart()
     })
 }
 
@@ -197,6 +190,19 @@ const load_chart = async () => {
             radius: "95%",
         }
     })
+}
+
+const reload_chart = () => {
+    var oldCanv = document.getElementById('myChart')
+        var canvasContainer = oldCanv.parentElement
+
+        canvasContainer.removeChild(oldCanv)
+
+        var newCanv = document.createElement('canvas')
+        newCanv.id = 'myChart'
+
+        canvasContainer.appendChild(newCanv)
+        load_chart()
 }
 
 const get_expense_labels = (totalExpense) => {
@@ -259,7 +265,7 @@ const editExpense = async (expense_id) => {
         .find((expense) => expense.dataset["expense_id"] === expense_id)
 
 
-    const editFormPresent = expenseContainer.querySelector('.edit-expense-form')
+    const editFormPresent = expenseContainer.querySelector('#edit-expense-form')
     
     if (editFormPresent) {
         expenseContainer.removeChild(editFormPresent)
@@ -273,10 +279,12 @@ const editExpense = async (expense_id) => {
 const createEditForm = async () => {
     editForm = document.createElement('form')
     //create a form here. initally hidden, and have it animated when on editExpense
-    editForm.className = "edit-expense-form form-group"
+    editForm.id = "edit-expense-form"
+    editForm.className = "form-group"
 
     itemName = document.createElement('input')
     itemName.className = "form-control"
+    itemName.id = "newName"
     itemName.name = "name"
     itemName.placeholder = "Item Name"
     
@@ -284,6 +292,8 @@ const createEditForm = async () => {
     itemPrice.className = "form-control"
     itemPrice.name = "price"
     itemPrice.placeholder = "Item Price"
+    itemPrice.type = "number"
+    itemPrice.step = "0.01"
 
     itemDate = document.createElement('input')
     itemDate.className = "form-control"
@@ -335,4 +345,39 @@ const createEditForm = async () => {
     editForm.append(submitEdit)
 
     return editForm
+}
+
+
+const update_edit_form = (expense_id, form) => {
+    edit_body = {}
+
+    Array.from(form.children).forEach(element => {
+        if (element.name !== "" && element.value !== "") {
+            edit_body[element.name] = element.value
+        }
+    })
+
+    if (Object.keys(edit_body).length === 0) {
+        return
+    }
+
+    fetch(`/update_expense/${expense_id}`, {
+        method: "Put",
+        body: JSON.stringify(edit_body)
+    })
+    .then(() => {
+        
+        reload_chart()
+        reload_expenses()
+    })
+
+}
+
+const reload_expenses = () => {
+    parent = document.querySelector('#expenses')
+
+    while (parent.firstChild) {
+        parent.removeChild(parent.firstChild)
+    }
+    load_expenses()
 }
