@@ -6,6 +6,7 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 
+
 from .models import User, Category, Item, Expense
 # Create your views here.
 
@@ -200,5 +201,32 @@ def update_expense(request, expense_id):
 
     return HttpResponse(status=204)
 
+
 def upload(request):
+    data = []
+    if request.method == "POST":
+        try:
+            csv_file = request.FILES['filename']
+            if not csv_file.name.endswith('.csv'):
+                return HttpResponseRedirect(reverse('upload'))
+            
+            file_data = csv_file.read().decode("utf-8")
+
+            lines = file_data.split('\n')
+            for line in lines:
+                items = line.split(',')
+                for i in range(len(items)):
+                    if i % 3 == 0:
+                        data_dict = dict()
+                        dateExp = items[i]
+                        if dateExp == "":
+                            continue
+                        data_dict['name'] = items[i + 2]
+                        data_dict['price'] = "" if items[i + 1] == "" else float(items[i + 1][1:])
+                        data_dict['date'] = dateExp[:len(dateExp) - 1]
+                        data_dict['category'] = dateExp[len(dateExp) - 1:]
+                        data.append(data_dict)
+        except:
+            return HttpResponseRedirect(reverse('upload'))
+        
     return render(request, 'expense/upload.html')
