@@ -159,11 +159,16 @@ def delete_expense(request, expense_id):
 
 
 def get_expenses(request):
-    userExpenses = Expense.objects.filter(user=request.user).order_by("date")
-    data = [expense.serialize() for expense in userExpenses]
+    if request.user.is_authenticated:
+        userExpenses = Expense.objects.filter(user=request.user).order_by("date")
+        data = [expense.serialize() for expense in userExpenses]
 
+        return JsonResponse({
+            "expenses": data
+        })
+    
     return JsonResponse({
-        "expenses": data
+        "error": "not signed in"
     })
 
 @csrf_exempt
