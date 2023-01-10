@@ -1,0 +1,15 @@
+#message {
+    font-size: 30px;
+}
+
+#upload-button-container {
+    margin: auto;
+}
+
+#uploaded-file {
+    width: 80%;
+    max-width: 800px;
+    margin: auto;
+    border: 1px solid black;
+    text-align: center;
+}

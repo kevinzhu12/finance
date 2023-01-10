@@ -5,9 +5,9 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
+from datetime import date
 
-
-from .models import User, Category, Item, Expense
+from .models import User, Category, Item, Expense, UploadFile
 # Create your views here.
 
 def index(request):
@@ -82,8 +82,9 @@ def month_view(request, month):
     })
 
 def get_categories(request):
-    categories = Category.objects.all().order_by('initial')
+    categories = Category.objects.filter(user=request.user).order_by('initial')
     listOfCategories = [f'{category.initial} - {category.name}' for category in categories]
+    print(categories)
 
     return JsonResponse({"categories": listOfCategories})
 
@@ -202,31 +203,92 @@ def update_expense(request, expense_id):
     return HttpResponse(status=204)
 
 
+#uploads the file to the server
 def upload(request):
-    data = []
     if request.method == "POST":
         try:
-            csv_file = request.FILES['filename']
-            if not csv_file.name.endswith('.csv'):
-                return HttpResponseRedirect(reverse('upload'))
-            
-            file_data = csv_file.read().decode("utf-8")
+            csv_file = request.FILES.get('filename')
 
-            lines = file_data.split('\n')
-            for line in lines:
-                items = line.split(',')
-                for i in range(len(items)):
-                    if i % 3 == 0:
-                        data_dict = dict()
-                        dateExp = items[i]
-                        if dateExp == "":
-                            continue
-                        data_dict['name'] = items[i + 2]
-                        data_dict['price'] = "" if items[i + 1] == "" else float(items[i + 1][1:])
-                        data_dict['date'] = dateExp[:len(dateExp) - 1]
-                        data_dict['category'] = dateExp[len(dateExp) - 1:]
-                        data.append(data_dict)
+            #ensures that a csv file is chosen
+            if csv_file == None or not csv_file.name.endswith('.csv'):
+                return render(request, 'expense/upload.html', {
+                    "message": "Please upload a CSV file"
+                })
+
+            #ensure that no duplicate files are uploaded by the same user
+            file_f_str = (f'uploads/{request.user.username}/{str(csv_file).replace(" ", "_")}')
+
+            for uploadedFile in UploadFile.objects.filter(user=request.user):
+                if uploadedFile.file.storage.exists(file_f_str):
+                    return render(request, 'expense/upload.html', {
+                        "message": "File already uploaded. Upload a different one?"
+                    })
+
+            save_file = UploadFile(user=request.user, file=csv_file, file_name=str(csv_file), date=date.today())
+            save_file.save()
+            return render(request, 'expense/upload.html', {
+                "message": "File has been uploaded. Upload another file?"
+            })
         except:
-            return HttpResponseRedirect(reverse('upload'))
+            pass
         
-    return render(request, 'expense/upload.html')
+
+    return render(request, 'expense/upload.html', {
+        "message": "Upload a new file?"
+    })
+
+
+def get_files(request):
+    files = UploadFile.objects.filter(user=request.user)
+    return_files = [file.serialize() for file in files]
+
+    return JsonResponse(return_files, safe=False)
+
+
+@csrf_exempt
+def file(request, file_id):
+    try:
+        file = UploadFile.objects.get(pk=file_id)
+
+    except:
+        return JsonResponse({"error", "file cannot be found"}, status=404)
+
+    if request.method == "PUT":
+        file.selected = not file.selected
+        file.save()  
+
+        return JsonResponse({
+            "selected": file.selected
+        })
+    else:
+        return JsonResponse({
+            "error": "Must be a PUT request"
+        }, status=404)
+
+
+
+# try:
+#     csv_file = request.FILES['filename']
+#     if not csv_file.name.endswith('.csv'):
+#         return HttpResponseRedirect(reverse('upload'))
+    
+#     file_data = csv_file.read().decode("utf-8")
+
+#     lines = file_data.split('\n')
+#     for line in lines:
+#         items = line.split(',')
+#         for i in range(len(items)):
+#             if i % 3 == 0:
+#                 data_dict = dict()
+#                 dateExp = items[i]
+#                 if dateExp == "":
+#                     continue
+#                 data_dict['name'] = items[i + 2]
+#                 data_dict['price'] = "" if items[i + 1] == "" else float(items[i + 1][1:])
+#                 data_dict['date'] = dateExp[:len(dateExp) - 1]
+#                 data_dict['category'] = dateExp[len(dateExp) - 1:]
+#                 user_data.append(data_dict)
+    
+#     # return JsonResponse(data, safe=False)
+# except:
+#     return HttpResponseRedirect(reverse('upload'))

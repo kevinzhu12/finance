@@ -1,4 +1,3 @@
-from webbrowser import get
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinLengthValidator
@@ -6,6 +5,7 @@ from django.core.validators import MinLengthValidator
 
 class User(AbstractUser):
     pass
+
 
 class Item(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="userItems", default=None)
@@ -16,6 +16,7 @@ class Item(models.Model):
 
     def __str__(self):
         return f"{self.name}: ${self.price}"
+
 
 class Category(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="userCategories", default=None)
@@ -36,7 +37,6 @@ class Category(models.Model):
         return f"{self.name} - {self.initial.upper()}"
 
 
-
 class Expense(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="userExpenses", default=None)
     date = models.DateField(default=None)
@@ -53,3 +53,26 @@ class Expense(models.Model):
             "item": {"name": self.item.name, "price": self.item.price},
             "category": {"name": self.category.name, "initial": self.category.initial, "color": self.category.color}
         }
+
+
+class UploadFile(models.Model):
+    def user_path_directory(self, filename):
+        return f'uploads/{self.user.username}/{filename}'
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="uploadedFiles")
+    file = models.FileField(upload_to=user_path_directory)
+    file_name = models.TextField(default=None)
+    date = models.DateField(default=None)
+    selected = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f'{self.user.username} - {self.file_name}'
+
+    def serialize(self):
+        return {
+            "file_name": self.file_name,
+            "date": self.date,
+            "selected": self.selected,
+            "file_id": self.id
+        }
+

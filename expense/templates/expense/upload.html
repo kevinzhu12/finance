@@ -1,19 +1,33 @@
 {% extends 'expense/layout.html' %}
+{% load static %}
+
+{% block style %}
+    <link rel="stylesheet" href="{% static 'expense/upload.css' %}?{% now 'U' %}" >
+{% endblock %}
 
 {% block script %}
     <script src="{% static 'expense/upload.js' %}"></script>
 {% endblock %}
 
 {% block body %}
-    <form enctype="multipart/form-data" action="{% url 'upload' %}" method="post">
-        {% csrf_token %}
-        <p>        
+
+    <div id="message"> {{ message }} </div>
+
+    <div id="upload-button-container">
+        <form enctype="multipart/form-data" action="{% url 'upload' %}" method="post">
+            {% csrf_token %}
             <input type="file" name="filename">
-        </p>
-
-        <p>
             <input type="submit" value="Upload now">
-        </p>
+        </form>
+    </div>
 
-    </form>
+    <div id="uploaded-files">
+        <!-- {% for file in hasUploadedFiles %}
+            <div id="uploaded-file" data-file_id={{file.id}}>{{ file.file_name }}</div>
+        {% endfor %} -->
+    </div>
+
+
+    <!-- display all of the expenses from uplaoded sheet and choose to update all or some-->
+
 {% endblock %}

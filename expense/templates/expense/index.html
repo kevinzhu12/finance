@@ -1,6 +1,9 @@
 {% extends "expense/layout.html" %}
 {% load static %}
 
+{% block style%}
+    <link rel="stylesheet" href="{% static 'expense/index.css' %}?{% now 'U' %}" >
+{% endblock %}
 
 {% block script %}
     <script src="https://www.gstatic.com/charts/loader.js"></script>
