@@ -75,4 +75,3 @@ class UploadFile(models.Model):
             "selected": self.selected,
             "file_id": self.id
         }
-

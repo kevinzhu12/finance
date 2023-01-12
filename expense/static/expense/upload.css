@@ -13,3 +13,9 @@
     border: 1px solid black;
     text-align: center;
 }
+
+#show-file-content, #delete-file {
+    margin: auto;
+    margin: 10px;
+    float: right;
+}

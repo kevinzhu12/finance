@@ -5,7 +5,9 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
-from datetime import date
+
+from datetime import date, datetime
+import os 
 
 from .models import User, Category, Item, Expense, UploadFile
 # Create your views here.
@@ -266,29 +268,56 @@ def file(request, file_id):
         }, status=404)
 
 
+def load_file_contents(request):
+    data = []
+    files = UploadFile.objects.filter(user=request.user).filter(selected=True)
 
-# try:
-#     csv_file = request.FILES['filename']
-#     if not csv_file.name.endswith('.csv'):
-#         return HttpResponseRedirect(reverse('upload'))
-    
-#     file_data = csv_file.read().decode("utf-8")
+    try:
+        for file in files:
+            f = file.file
+            file_data = f.read().decode("utf-8")
 
-#     lines = file_data.split('\n')
-#     for line in lines:
-#         items = line.split(',')
-#         for i in range(len(items)):
-#             if i % 3 == 0:
-#                 data_dict = dict()
-#                 dateExp = items[i]
-#                 if dateExp == "":
-#                     continue
-#                 data_dict['name'] = items[i + 2]
-#                 data_dict['price'] = "" if items[i + 1] == "" else float(items[i + 1][1:])
-#                 data_dict['date'] = dateExp[:len(dateExp) - 1]
-#                 data_dict['category'] = dateExp[len(dateExp) - 1:]
-#                 user_data.append(data_dict)
-    
-#     # return JsonResponse(data, safe=False)
-# except:
-#     return HttpResponseRedirect(reverse('upload'))
+            lines = file_data.split('\n')
+            for line in lines:
+                items = line.split(',')
+                for i in range(len(items)):
+                    if i % 3 == 0:
+                        data_dict = dict()
+                        dateExp = items[i]
+                        if dateExp != "":
+                            data_dict['name'] = items[i + 2]
+                            data_dict['price'] = "" if items[i + 1] == "" else float(items[i + 1][1:])
+                            data_dict['date'] = dateExp[:len(dateExp) - 1]
+                            data_dict['category'] = dateExp[len(dateExp) - 1:]
+                            data.append(data_dict)
+            f.close()
+    except:
+        return JsonResponse([], safe=False)
+
+
+    data.sort(key=(lambda x: datetime.strptime(x['date'], "%m/%d/%y")))
+
+    for i in range(len(data)):
+        data[i]['id'] = i + 1
+
+    return JsonResponse(data, safe=False)
+
+@csrf_exempt
+def delete_selected_files(request):
+    if request.method == "PUT":
+        data = json.loads(request.body)
+        selected_file_ids = data['selected_files']
+
+        for file_id in selected_file_ids:
+            try:
+                delete_file = UploadFile.objects.get(pk=file_id)
+                file_name = delete_file.file_name.replace(" ", "_")
+
+                #remove delete_file from db
+                delete_file.delete()
+
+                #remove file from server folder
+                os.remove(f"./uploads/{request.user.username}/{file_name}")
+            except:
+                pass
+    return HttpResponse(status=204)
